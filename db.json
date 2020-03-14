@@ -46,7 +46,19 @@
       "id": 8,
       "name": "Little Green Men",
       "image": "http://www.pngmart.com/files/3/Toy-Story-Alien-PNG-File.png",
-      "likes": -2
+      "likes": 0
+    },
+    {
+      "id": 9,
+      "name": "Panda",
+      "image": "https://www.ikea.com/us/en/images/products/kramig-soft-toy__0162448_PE317642_S5.JPG",
+      "likes": 24
+    },
+    {
+      "id": 10,
+      "name": "Fortnite",
+      "image": "https://cdn11.bigcommerce.com/s-0kvv9/images/stencil/1280x1280/products/281980/395677/apitymrvz__10747.1545411570.jpg?c=2&imbypass=on",
+      "likes": 4
     }
   ]
 }
