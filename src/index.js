@@ -8,6 +8,10 @@ document.addEventListener("DOMContentLoaded", () => {
     addToy = !addToy;
     if (addToy) {
       toyForm.style.display = "block";
+      toyForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      newToy(e.target)
+})
     } else {
       toyForm.style.display = "none";
     }
@@ -27,6 +31,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 });
+
+function newToy(target) {
+  let name = target['name'].value
+  let image = target['image'].value
+
+  let configObject = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    },
+    body: JSON.stringify({
+      "name": name,
+      "image": image,
+      "likes": 0
+    })
+  }
+  fetch('http://localhost:3004/toys', configObject)
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(object) {
+      renderToy(object);
+    })
+    .catch(function(error) {
+      console.log(error.message);
+    });
+}
 
 function renderToy(toy) {
   //create card
@@ -91,7 +123,7 @@ function likeToy(toy) {
     });
   let likes = document.getElementById(`${toy.name}`)
   likes.innerHTML = `${toy.name} has ${toy.likes + 1} likes`
-}
+};
 
 // h2 tag with the toy's name
 // img tag with the src of the toy's image attribute and the class name "toy-avatar"
