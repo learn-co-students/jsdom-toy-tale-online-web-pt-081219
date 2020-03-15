@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   let toyCollection = document.getElementById('toy-collection')
-  fetch('http://localhost:3000/toys')
+  fetch('http://localhost:3004/toys')
   .then(function(response) {
     return response.json();
 })
@@ -22,12 +22,13 @@ document.addEventListener("DOMContentLoaded", () => {
     let keys = []
     keys.push(Object.keys(json))
     for (const element of keys['0']) {
-      addToy(json[element])
+      renderToy(json[element])
     }
 
 });
+});
 
-function addToy(toy) {
+function renderToy(toy) {
   //create card
   let collection = document.querySelector("#toy-collection")
   let card = document.createElement('div')
@@ -38,16 +39,17 @@ function addToy(toy) {
   card.appendChild(name)
   // likes count
   let likes = document.createElement('p')
+  likes.id = toy.name
   likes.innerHTML = `${toy.name} has ${toy.likes} likes`
   card.appendChild(likes)
   // like button
-  let likeBtn = document.createElement('button')
+  const likeBtn = document.createElement('button')
   likeBtn.id = toy.id
   likeBtn.innerHTML = "Like"
-  card.appendChild(likeBtn)
   likeBtn.addEventListener('click', (e) => {
-    likeToy(e)
-  })
+    findToy(e.target.id)
+})
+  card.appendChild(likeBtn)
   //img
   let image = document.createElement('img')
   image.src = toy.image
@@ -56,10 +58,40 @@ function addToy(toy) {
   collection.appendChild(card)
 };
 
-function likeToy(e) {
-  console.log(e.target)
-}
+function findToy(id) {
+  fetch(`http://localhost:3004/toys/${id}`)
+  .then(function(response) {
+    return response.json();
+})
+  .then(function(json) {
+    likeToy(json)
 });
+}
+
+function likeToy(toy) {
+  let configObject = {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    },
+    body: JSON.stringify({
+      'likes': toy.likes + 1
+    })
+  }
+  fetch(`http://localhost:3004/toys/${toy.id}`, configObject)
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(object) {
+      console.log(object);
+    })
+    .catch(function(error) {
+      console.log(error.message);
+    });
+  let likes = document.getElementById(`${toy.name}`)
+  likes.innerHTML = `${toy.name} has ${toy.likes + 1} likes`
+}
 
 // h2 tag with the toy's name
 // img tag with the src of the toy's image attribute and the class name "toy-avatar"
