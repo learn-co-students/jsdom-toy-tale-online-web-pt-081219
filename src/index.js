@@ -3,7 +3,8 @@ let addToy = false;
 document.addEventListener("DOMContentLoaded", () => {
   const addBtn = document.querySelector("#new-toy-btn");
   const toyForm = document.querySelector(".container");
-  const toyContainer = document.getElementById('toy-collection') 
+  const submit = document.getElementsByClassName("submit")[0];
+
   addBtn.addEventListener("click", () => {
     // hide & seek with the form
     addToy = !addToy;
@@ -13,71 +14,101 @@ document.addEventListener("DOMContentLoaded", () => {
       toyForm.style.display = "none";
     }
   });
-  // fetchToys();
-  fetch("http://localhost:3000/toys")
-  .then(resp => resp.json())
-  .then(function(json){
-    json.forEach(toy => {
-      const div = document.createElement('div');
-      div.setAttribute('class', 'card');
-      const h2= document.createElement('h2');
-      const p = document.createElement('p');
-      const image = document.createElement('img');
-      const button = document.createElement('button');
-      image.setAttribute('class', 'toy-avatar');
-      button.setAttribute('class', 'like-btn');
-      h2.innerHTML = toy.name;
-      image.src = toy.image;
-      p.innerHTML= toy.likes+ " likes";
-      button.innerHTML = "Like <3"
-      div.appendChild(h2);
-      div.appendChild(image);
-      div.appendChild(p);
-      div.appendChild(button)
-      toyContainer.appendChild(div);
-    })
-  });
+
+  renderToys();
+  
+  submit.addEventListener("click", addNewToy);
+
+
 });
 
-// function fetchToys(){
-//   return fetch("http://localhost:3000/toys")
-//   .then(res => res.json())
-//   .then(data => toysOnDOM(data))
-// }
+function renderToys() {
+  fetch("http://localhost:3000/toys")
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (json) {
+      addToyCollection(json);
+    });
+}
 
-// function toysOnDOM(json){
-//   json.forEach(toy => {
-//     addToyToDOM(toy);
-//   })
-// }
+function addToyCollection(toys) {
+  const toyCollection = document.getElementById("toy-collection");
 
-// function addToyToDOM(toy){
-//   const toyCollection = document.getElementById("toy-collection")
-//   toyColection.append(makeCard(toy));
-// }
-
-// function makeCard(toy){
-//   cosnt div = document.createElement("div");
-//   div.id = toy.id;
-//   div.setAttribute("class", "card");
-
-//   let h2 = document.createElement("h2")
-//   let img = document.createElement("img")
-//   let p = document.createElement("p")
-//   let button = document.createElement("button")
-
-//   h2.innerText = toy.name
-//   img.src = toy.image
-//   p.innerText = toy.likes
+  while (toyCollection.firstChild) {
+    toyCollection.removeChild(toyCollection.firstChild);
+  }
   
-//   button.classList.add("like-btn");
-//   button.innerText = "Like <3";
+  for (const toy in toys) {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const name = document.createElement("h2");
+    name.innerHTML = toys[toy].name;
+    card.appendChild(name);
+
+    const img = document.createElement("img");
+    img.className = "toy-avatar";
+    img.src = toys[toy].image;
+    card.appendChild(img);
+
+    const likes = document.createElement("p");
+    likes.innerHTML = toys[toy].likes + " Likes";
+    card.appendChild(likes);
+
+    const button = document.createElement("button");
+    button.innerHTML = "Like <3";
+    button.className = "like-btn";
+    button.addEventListener("click", function(e) {
+      updateLikes(toys[toy]);
+      p.innerHTML = toys[toy].likes + " Likes";
+    });
+    card.appendChild(button)
+
+    toyCollection.appendChild(card);
+
+  }
+}
 
 
-//   div.append(h2);
-//   div.append(img);
-//   div.append(p);
-//   div.append(button);
+function addNewToy(event) {
+  event.preventDefault();
+  const toyName = document.getElementsByTagName("input")[0].value;
+  const toyImage = document.getElementsByTagName("input")[1].value;
 
-//   return div;
-// }
+  let formData = {
+    id: "",
+    name: toyName,
+    image: toyImage,
+    likes: 0
+  };
+
+  let configObj = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    },
+    body: JSON.stringify(formData)
+  };
+
+  fetch("http://localhost:3000/toys", configObj);
+  renderToys();
+  location.reload();
+
+}
+
+function updateLikes(toy) {
+  toy.likes++;
+  let configObj = {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    },
+    body: JSON.stringify({
+      "likes": toy.likes
+    })
+  }
+  fetch(`http://localhost:3000/toys/${toy.id}`, configObj);
+}
