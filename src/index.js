@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded" , () =>{
-  
+
 })
 
 const addBtn = document.querySelector('#new-toy-btn')
@@ -18,7 +18,7 @@ function postToy(toy_data) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Accept: "application/json"
+        'Accept': "application/json"
       },
       body: JSON.stringify({
         "name": toy_data.name.value,
@@ -28,9 +28,9 @@ function postToy(toy_data) {
       })
     })
     .then(res => res.json())
-    .then((obj_toy) => {
-      let new_toy = renderToys(obj_toy)
-      divCollect.append(new_toy)
+    .then((json) => {  // .then(obj_toy) => {
+      let new_toy = renderToys(json) //let new_toy = renderToys(obj_toy)
+      divCollect.append(new_toy) //divCollect.append(new_toy)
     })
 }
 
